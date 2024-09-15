@@ -14,12 +14,13 @@
   "contributes": {
     "commands": [
       {
-        "command": "simple-graphql-client.helloWorld",
-        "title": "Hello World"
-      },
-      {
         "command": "catCoding.start",
         "title": "Start new cat conding session",
+        "category": "Cat Coding"
+      },
+      {
+        "command": "catCoding.doRefactor",
+        "title": "do refactor",
         "category": "Cat Coding"
       }
     ]
