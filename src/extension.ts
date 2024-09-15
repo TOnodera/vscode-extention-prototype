@@ -12,32 +12,32 @@ const cats = {
 };
 
 export function activate(context: vscode.ExtensionContext) {
+  let currentPanel: vscode.WebviewPanel | undefined = undefined;
   context.subscriptions.push(
     vscode.commands.registerCommand("catCoding.start", () => {
-      const panel = vscode.window.createWebviewPanel(
-        "catCoding",
-        "Cat Coding",
-        vscode.ViewColumn.One
-      );
+      const columnToShowIn = vscode.window.activeTextEditor
+        ? vscode.window.activeTextEditor.viewColumn
+        : undefined;
 
-      let iteration = 0;
-      const updateWebView = () => {
-        const cat = iteration++ % 2 ? "Compiling Cat" : "Coding Cat";
-        panel.title = cat;
-        panel.webview.html = getWebviewContent(cat);
-      };
+      if (currentPanel) {
+        currentPanel.reveal(columnToShowIn);
+      } else {
+        currentPanel = vscode.window.createWebviewPanel(
+          "catCoding",
+          "Cat Coding",
+          vscode.ViewColumn.One
+        );
 
-      updateWebView();
+        currentPanel.webview.html = getWebviewContent("Coding Cat");
 
-      const interval = setInterval(updateWebView, 1000);
-
-      panel.onDidDispose(
-        () => {
-          clearInterval(interval);
-        },
-        null,
-        context.subscriptions
-      );
+        currentPanel.onDidDispose(
+          () => {
+            currentPanel = undefined;
+          },
+          null,
+          context.subscriptions
+        );
+      }
     })
   );
 }
