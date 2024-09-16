@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "simple-graphql-client.helloWorld",
-        "title": "Hello World"
+        "command": "sgc.start",
+        "title": "start simple-graphql-client."
       }
     ]
   },
@@ -28,7 +28,10 @@
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "install:all": "npm install && cd webview-ui && npm install",
+    "start:webview": "cd webview-ui && npm run start",
+    "build:webview": "cd webview-ui && npm run build"
   },
   "devDependencies": {
     "@types/vscode": "^1.93.0",

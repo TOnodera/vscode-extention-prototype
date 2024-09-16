@@ -1,26 +1,63 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
+import { getUri } from "./utilities/getUri";
+import { getNonce } from "./utilities/getNonce";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  const disposable = vscode.commands.registerCommand("sgc.start", () => {
+    const extensionUri = context.extensionUri;
+    vscode.window.showInformationMessage("start simple-graphql-client🚀");
+    const panel = vscode.window.createWebviewPanel(
+      "react.js",
+      "React.js",
+      vscode.ViewColumn.One,
+      {
+        enableScripts: true,
+        localResourceRoots: [
+          vscode.Uri.joinPath(extensionUri, "webview-ui/dist"),
+        ],
+      }
+    );
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "simple-graphql-client" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('simple-graphql-client.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from simple-graphql-client!');
-	});
-
-	context.subscriptions.push(disposable);
+    panel.webview.html = _getWebviewContent(panel.webview, extensionUri);
+  });
+  context.subscriptions.push(disposable);
 }
 
-// This method is called when your extension is deactivated
+function _getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri) {
+  // The CSS file from the React build output
+  const stylesUri = getUri(webview, extensionUri, [
+    "webview-ui",
+    "dist",
+    "assets",
+    "index.css",
+  ]);
+  // The JS file from the React build output
+  const scriptUri = getUri(webview, extensionUri, [
+    "webview-ui",
+    "dist",
+    "assets",
+    "index.js",
+  ]);
+
+  const nonce = getNonce();
+
+  // Tip: Install the es6-string-html VS Code extension to enable code highlighting below
+  return /*html*/ `
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+          <link rel="stylesheet" type="text/css" href="${stylesUri}">
+          <title>Hello World</title>
+        </head>
+        <body>
+          <div id="root"></div>
+          <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
+        </body>
+      </html>
+    `;
+}
+
 export function deactivate() {}
